@@ -25,14 +25,7 @@ jquery plugin to submit form data as XMLHttpRequest (AJAX)
 
 ###Public Events
 ```javascript
-var s = "JavaScript syntax highlighting";
-alert(s);
-```
-
-
-
-```javascript
-// // before ajax request
+// before ajax request
 beforeSubmit: function(form) {
     ...
 }
