@@ -23,6 +23,11 @@ jquery plugin to submit form data as XMLHttpRequest (AJAX)
 ...
 ```
 
+```javascript
+var s = "JavaScript syntax highlighting";
+alert(s);
+```
+
 ###Public Events
 
 ```javascript
