@@ -23,15 +23,9 @@ jquery plugin to submit form data as XMLHttpRequest (AJAX)
 ...
 ```
 
-```javascript
-$('form').satAjaxForm({
-
-    beforeSubmit: function(form) {},
-    
-    afterSubmit: function(response, form) {},
-    
-    onError : function(form, jqXHR, textStatus, errorThrown){}
-    
-});
-
-```
+###Public Events
+Event name | Parameters | Description
+--- | --- | ---
+| beforeSubmit | `SatAjaxForm` |
+| afterSubmit | `Response`, `SatAjaxForm` |
+| onError | `SatAjaxForm`, `jqXHR`, `textStatus`, `errorThrown` |
