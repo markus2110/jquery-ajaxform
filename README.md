@@ -22,3 +22,23 @@ jquery plugin to submit form data as XMLHttpRequest (AJAX)
 </script>
 ...
 ```
+
+###Public Events
+
+```javascript
+// // before ajax request
+beforeSubmit: function(form) {
+    ...
+}
+
+// $.ajax Success
+afterSubmit: function(response, form) {
+    ...
+}
+        
+        
+// $.ajax ERROR
+onError : function(form, jqXHR, textStatus, errorThrown){
+    ...
+}
+```
