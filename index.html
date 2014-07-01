@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jQuery ajaxform plugin</title>
+  </head>
+  <body>
+      
+      <div>
+          <form name="ajaxform" method="post" action="post.php" data-type="html">
+              <label for="username">Username</label>
+              <input type="text" id="username" name="username" />
+              <label for="password">Password</label>
+              <input type="text" id="password" name="password" />              
+              <input type="submit" name="postForm" value="Login" />
+          </form>
+          
+          <form name="ajaxform" method="post" action="post.php" data-type="json">
+              <label for="username2">Username</label>
+              <input type="text" id="username2" name="username" />
+              <label for="password2">Password</label>
+              <input type="text" id="password2" name="password" />              
+              <input type="submit" name="postForm" value="Login" />
+          </form>          
+      </div>
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+      <script src="js/jquery.sat.ajaxform.js"></script>
+      <script type="text/javascript">
+          jQuery(function(){
+             $('form').satAjaxForm();
+          });
+      </script>
+  </body>
+</html>
