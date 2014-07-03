@@ -1,6 +1,7 @@
 <?php
 
-print_r($_POST);
-
-
+$html = array(
+        '<strong>Alles OK</strong>',
+);
+die(implode("\n",$html));
 ?>

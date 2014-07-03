@@ -1,37 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>jQuery ajaxform plugin</title>
-  </head>
-  <body>
-      
-      <div>
-          <form name="ajaxform" method="post" action="post.php" data-type="html">
-              <label for="username">Username</label>
-              <input type="text" id="username" name="username" />
-              <label for="password">Password</label>
-              <input type="text" id="password" name="password" />              
-              <input type="submit" name="postForm" value="Login" />
-          </form>
-          
-          <form name="ajaxform" method="post" action="post.php" data-type="json">
-              <label for="username2">Username</label>
-              <input type="text" id="username2" name="username" />
-              <label for="password2">Password</label>
-              <input type="text" id="password2" name="password" />              
-              <input type="submit" name="postForm" value="Login" />
-          </form>          
-      </div>
-      
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-      <script src="js/jquery.sat.ajaxform.js"></script>
-      <script type="text/javascript">
-          jQuery(function(){
-             $('form').satAjaxForm();
-          });
-      </script>
-  </body>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+        <title>jQuery ajaxform plugin</title>
+    </head>
+    <body>
+
+        <div class="container">
+            <div class="col-lg-4 col-md-4">
+                <form role="form" name="ajaxform" method="post" action="json.php" data-type="json">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Email address</label>
+                        <input name="email" type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Password</label>
+                        <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputFile">File input</label>
+                        <input name="file" type="file" id="exampleInputFile">
+                        <p class="help-block">Example block-level help text here.</p>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox"> Check me out
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+            </div>
+
+            <div class="col-lg-4 col-md-4">
+                <form role="form" name="ajaxform" method="post" action="html.php" data-type="html">
+                    <div class="form-group">
+                        <label>Firstname</label>
+                        <input name="firstname" class="form-control" >
+                    </div>
+                    <div class="form-group">
+                        <label>Lastname</label>
+                        <input name="lastname" class="form-control" >
+                    </div>
+                    <div class="form-group">
+                        <label>E-Mail</label>
+                        <input name="email" class="form-control" >
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+            </div>
+
+            <div class="col-lg-4 col-md-4">
+                Form 3
+            </div>
+
+        </div>
+
+        <!--
+        <div>
+            <form name="ajaxform" method="post" action="html.php" data-type="html">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" />
+                <label for="password">Password</label>
+                <input type="text" id="password" name="password" />
+                <input type="submit" name="postForm" value="Login" />
+            </form>
+
+            <form name="ajaxform" method="post" action="json.php" data-type="json">
+                <label for="username2">Username</label>
+                <input type="text" id="username2" name="username" />
+                <label for="password2">Password</label>
+                <input type="text" id="password2" name="password" />
+                <input type="submit" name="postForm" value="Login" />
+            </form>
+        </div>
+        -->
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="js/jquery.sat.ajaxform.js"></script>
+        <script type="text/javascript">
+            jQuery(function() {
+                $('form').satAjaxForm({
+                    enableMessage   : true,
+                    messagePosition : 'top',
+                    messageMarkup : '<div class="alert"></div>',
+
+                    //successMessage : 'Form is OK',
+                    successClass : 'alert-success',
+
+                    //errorMessage   : 'Sorry ... ERROR',
+                    errorClass : 'alert-danger',
+
+                    beforeSubmit : function(form){
+                        form.element.hide('slow');
+                    },
+
+                    afterSubmit : function(data, form){
+                        form.element.show('slow');
+                    },
+
+                    onError : function(form, jqXHR, textStatus, errorThrown){
+                        alert('ERROR');
+                    }
+                });
+            });
+        </script>
+    </body>
 </html>
