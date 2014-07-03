@@ -32,17 +32,25 @@
      */
     var defaults = {
         
-        beforeSubmit: function(form) {
-            console.log(form.formDataArray, form.formDataString)
-        },
+        enableMessage : true,
         
-        afterSubmit: function(response, form) {
-            console.log(response, form.formDataString)
-        },
+        messagePosition : 'top', // or bottom
         
-        onError : function(form, jqXHR, textStatus, errorThrown){
-            console.log(form, jqXHR, textStatus, errorThrown);
-        }
+        messageMarkup : '<div></div>',
+        
+        successMessage : null,
+        
+        successClass : 'success',
+        
+        errorMessage : null,
+        
+        errorClass : 'error',
+        
+        beforeSubmit: function(form) {},
+        
+        afterSubmit: function(response, form) {},
+        
+        onError : function(form, jqXHR, textStatus, errorThrown){}
     };
     /**
      *
@@ -56,9 +64,7 @@
         
         this.element = element;
         
-        this.extractProperties();
-        
-        this.disableDefaultBehavior();
+        this.init();
         
         return this;
     };
@@ -81,6 +87,13 @@
         
         formDataString : null,
         
+        
+        init : function(){
+            this.extractProperties();
+            this.disableDefaultBehavior();
+            this.injectMessageBox();
+        },
+        
         extractProperties : function(){
             
             // set the submit url
@@ -98,9 +111,43 @@
          * @returns {void}
          */
         disableDefaultBehavior : function(){
-            this.element.find('input[type="submit"]').bind('click', this, this.submit);
+            var submitBtn;
+            
+            // find input type=submit
+            submitBtn = this.element.find('input[type="submit"]');
+            
+            // no input type, try to find button type=submit
+            if(submitBtn.length === 0){
+                submitBtn = this.element.find('button[type="submit"]');
+            }
+                    
+            submitBtn.bind('click', this, this.submit);
+            
             // clear the action url
             this.element.attr('action', '#');
+        },
+        
+        /**
+         * Injects a message container to display Error or Success message
+         * 
+         * @returns {void}
+         */
+        injectMessageBox : function(){
+            if(this.options.enableMessage){
+                var mBox = $(this.options.messageMarkup);
+                mBox.addClass('sat_ajaxform message_box');
+                mBox.css('display', 'none');
+                switch(this.options.messagePosition){
+                    case 'bottom':
+                        this.element.append(mBox);
+                        break;
+                        
+                    case 'top':
+                    default:
+                        this.element.prepend(mBox);
+                        break;
+                }
+            }
         },
         
         /**
@@ -123,16 +170,13 @@
                 dataType    : _this.dataType,
                 type        : _this.method,
 
-                //beforeSend  :  ,
-
-                //complete    : ,
-
                 error : function( jqXHR, textStatus, errorThrown ){
-                    _this.options.onError(_this, jqXHR, textStatus, errorThrown);
+                    _this.onError(jqXHR, textStatus, errorThrown);
+
                 },
                 
-                success : function(data, textStatus, jqXHR ){
-                    _this.options.afterSubmit(data, _this);
+                success : function(response, textStatus, jqXHR ){
+                    _this.onSuccess(response, textStatus, jqXHR);
                 }
             });
             
@@ -140,6 +184,108 @@
         },
         
         
+        /**
+         * 
+         * @param {obj} jqXHR
+         * @param {string} textStatus
+         * @param {string} errorThrown
+         * @returns {void}
+         */
+        onError : function(jqXHR, textStatus, errorThrown){
+            // show error response, if messageBox is enabled
+            var 
+                messageBox = this.element.find('.message_box'),
+                message = (this.options.errorMessage) ? this.options.errorMessage : errorThrown;
+            ;
+            if(messageBox.length > 0){
+                messageBox.show();
+                messageBox.addClass(this.options.errorClass);
+                messageBox.html(message);
+            }            
+            
+            // trigger onError Event
+            this.options.onError(this, jqXHR, textStatus, errorThrown);            
+        },
+
+
+        /**
+         * 
+         * @param {mixed} response
+         * @param {string} textStatus
+         * @param {object} jqXHR
+         * @returns {void}
+         */
+        onSuccess : function(response, textStatus, jqXHR){
+            
+            var 
+                messageBox = this.element.find('.message_box'),
+                message = null
+            ;
+            
+            // has message ?
+            message = this.getMessage(response);
+            
+            if(messageBox.length > 0 && message){
+                messageBox.show();
+                messageBox.addClass(this.options.successClass);
+                messageBox.html(message);                
+            }             
+            
+            // trigger afterSubmit Event
+            this.options.afterSubmit(response, this);
+        },
+        
+        /**
+         * 
+         * @param {mixed} response
+         * @returns {Boolean|json.message|_L27.SatAjaxForm.options.successMessage|_L27.SatAjaxForm.options.errorMessage}
+         */
+        getMessage : function(response){
+            var message;
+            // is json
+            switch(this.dataType){
+                case 'json':
+                    message = this.parseJSON(response);
+                    break;
+                    
+                case 'html':
+                default:
+                    message = response;
+                break;
+            }
+            
+            return message;
+        },
+        
+        /**
+         * 
+         * @param {JSON} json
+         * @returns {json.message|_L27.SatAjaxForm.options.successMessage|_L27.SatAjaxForm.options.errorMessage|Boolean}
+         */
+        parseJSON : function(json){
+            
+            var message; 
+            
+            // success = false
+            if(!json.success){
+                message = (typeof json.message !== "undefined" ) ? json.message : this.options.errorMessage;
+                this.onError(json, 'error', message);
+                return false;
+            }
+            
+            // success = true
+            if(json.success){
+                message = (typeof json.message !== "undefined" ) ? json.message : this.options.successMessage;
+                return message;
+            }
+        },
+
+        
+        
+        /**
+         * 
+         * @returns {_L27.SatAjaxForm.element.selector}
+         */
         getSelector: function() {
             return this.element.selector;
         }
@@ -165,11 +311,7 @@
      * 
      */
     $.fn.satAjaxForm.defaults = defaults;
-    
-    
-//    function debug(obj){
-//        console.log('Debug', obj);
-//    };
+
 })(jQuery);
 
 
