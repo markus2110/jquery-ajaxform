@@ -1,5 +1,6 @@
 jquery-ajaxform
 ===============
+Version: 1.0.0 - 2014-07-19 02:50:56
 
 jquery plugin to submit form data as XMLHttpRequest (AJAX)
 
