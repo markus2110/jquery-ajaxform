@@ -1,4 +1,6 @@
 #!/usr/bin/php
+
+# PHP shell script to bump a new version into the readme file
 <?php
 
 if (!isset($argv[1])) {
