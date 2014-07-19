@@ -101,14 +101,20 @@
                 var mBox = $(this.options.messageMarkup);
                 mBox.addClass('sat_ajaxform message_box');
                 mBox.addClass(this.options.errorClass);
-                mBox.html('<strong>Ups!</strong><br />The form might be not valid for a AJAX submit');
+                mBox.html(this.options.errorMessage);
                 this.element.prepend(mBox);
             }
         },
 
         checkForm : function(){
             // check is upload form
-            if(typeof this.element.attr('enctype') !== 'undefined' && this.element.attr('enctype')==='multipart/form-data'){
+            if (typeof this.element.attr('enctype') !== 'undefined' && this.element.attr('enctype') === 'multipart/form-data') {
+                this.options.errorMessage = '<strong>Ups!</strong><br />The form seems to be a file upload form.<br />The plugin doesn\'t support this type of form';
+                return false;
+            }
+
+            if (this.element.find('input[type=file]').length) {
+                this.options.errorMessage = '<strong>Ups!</strong><br />Found one or more upload fields, the plugin doesn\'t support file upload.';
                 return false;
             }
 
