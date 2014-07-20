@@ -33,9 +33,12 @@
     var defaults = {
 
         // Just works in modern Browsers ( FF, Chrome, IE10 )
-        enableFileReader: true,
+        enableFileReader: false,
 
-        fileReaderMaxSize : 4, // 4MB
+        fileReaderOptions : {
+            maxSize         : 2, // 4MB
+            uploadMultiple  : false // allows to upload multiple files
+        },
 
         enableMessage : true,
 
@@ -120,14 +123,20 @@
          * @returns {Boolean}
          */
         checkForm : function(){
+            var
+                form    = this.element,
+                // FileReader option
+                fro     = this.options.enableFileReader
+            ;
+
             // Check for multipart/form-data
-            if (typeof this.element.attr('enctype') !== 'undefined' && this.element.attr('enctype') === 'multipart/form-data') {
+            if (!fro && typeof form.attr('enctype') !== 'undefined' && form.attr('enctype') === 'multipart/form-data') {
                 this.options.errorMessage = '<strong>Ups!</strong><br />The form seems to be a file upload form.<br />The plugin doesn\'t support this type of form';
                 return false;
             }
 
             // Check for file input type
-            if (this.element.find('input[type=file]').length) {
+            if (!fro && form.find('input[type=file]').length) {
                 this.options.errorMessage = '<strong>Ups!</strong><br />Found one or more upload fields, the plugin doesn\'t support file upload.';
                 return false;
             }
