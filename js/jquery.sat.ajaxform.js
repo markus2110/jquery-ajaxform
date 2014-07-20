@@ -35,6 +35,8 @@
         // Just works in modern Browsers ( FF, Chrome, IE10 )
         enableFileReader: true,
 
+        fileReaderMaxSize : 4, // 4MB
+
         enableMessage : true,
 
         messagePosition : 'top', // or bottom
