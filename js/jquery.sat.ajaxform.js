@@ -113,7 +113,10 @@
                 mBox.addClass('sat_ajaxform message_box');
                 mBox.addClass(this.options.errorClass);
                 mBox.html(this.options.errorMessage);
-                this.element.prepend(mBox);
+
+                if(this.options.errorMessage){
+                    this.element.prepend(mBox);
+                }
             }
         },
 
@@ -126,10 +129,8 @@
         checkForm : function(){
             var
                 check       = false,
-                form        = this.element,
 
                 isUploadForm  = this.isUploadForm(),
-
                 // FileReader option
                 fro         = this.options.enableFileReader
             ;
@@ -151,6 +152,7 @@
              * Is FileReader enabled and does the browser support it
              */
             else if(fro && isUploadForm && !this.supportsFileReader()){
+                this.options.errorMessage = '<strong>Ups!</strong><br />FileReader not supported.';
                 check = false;
             }
 
@@ -160,8 +162,6 @@
             else{
                 check = true;
             }
-
-
 
             return check;
         },
@@ -261,29 +261,81 @@
          * @returns {Boolean} false to prevent default submit behavior
          */
         submit : function(event){
-            var _this = event.data;
+            var
+                _this       = event.data,
+                form        = _this.element,
+                messageBox  = form.find('.message_box')
+            ;
 
+            if(_this.uploadForm){
+                var maxSize = parseInt(_this.options.fileReaderOptions.maxSize)*1048576;
+                var uploadFields = form.find('input[type=file]');
+                uploadFields.each(function(index, file){
+
+                    if(file.files[0].size > maxSize){
+                        _this.options.errorMessage = '<strong>Ups!</strong><br />The selected file might be too big';
+                        _this.onError(file, 'error');
+                    }else{
+                        // hide error box
+                        if(messageBox.length>0){
+                            messageBox.hide();
+                        }
+
+                        var Reader = new FileReader();
+                        Reader.onload = function(e){
+                            if(e.target.result){
+                                var formData = new FormData();
+                                formData.append('file', file.files[0]);
+
+                                for(var i in _this.element.serializeArray()){
+                                    formData.append(_this.element.serializeArray()[i]['name'], _this.element.serializeArray()[i]['value']);
+                                };
+
+                                $.ajax({
+                                    url : _this.url,
+                                    data: formData,
+                                    processData: false,
+                                    type : _this.method,
+                                    success: function(data){
+                                        console.log(data);
+                                    }
+                                });
+                            }
+                        }
+                        Reader.readAsDataURL(file.files[0]);
+                    }
+                });
+            }
+
+
+
+            else{
             _this.formDataArray     = _this.element.serializeArray();
             _this.formDataString    = _this.element.serialize();
 
             // trigger before submit event
             _this.options.beforeSubmit(_this);
 
-            $.ajax({
-                url         : _this.url,
-                data        : _this.formDataString,
-                dataType    : _this.dataType,
-                type        : _this.method,
+//            $.ajax({
+//                url         : _this.url,
+//                data        : _this.formDataString,
+//                dataType    : _this.dataType,
+//                type        : _this.method,
+//
+//                error : function( jqXHR, textStatus, errorThrown ){
+//                    _this.onError(jqXHR, textStatus, errorThrown);
+//
+//                },
+//
+//                success : function(response, textStatus, jqXHR ){
+//                    _this.onSuccess(response, textStatus, jqXHR);
+//                }
+//            });
+            }
 
-                error : function( jqXHR, textStatus, errorThrown ){
-                    _this.onError(jqXHR, textStatus, errorThrown);
 
-                },
 
-                success : function(response, textStatus, jqXHR ){
-                    _this.onSuccess(response, textStatus, jqXHR);
-                }
-            });
+
 
             return false;
         },
