@@ -12,7 +12,7 @@
 
         <div class="container">
             <div class="col-lg-4 col-md-4">
-                <form role="form" name="ajaxform" method="post" action="json.php" data-type="json">
+                <form role="form" name="ajaxform" method="post" action="html.php" data-type="json">
                     <div class="form-group">
                         <label for="exampleInputEmail1">Email address</label>
                         <input name="email" type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
@@ -95,16 +95,8 @@
                     //errorMessage   : 'Sorry ... ERROR',
                     errorClass : 'alert-danger',
 
-                    beforeSubmit : function(form){
-                        form.element.hide('slow');
-                    },
-
-                    afterSubmit : function(data, form){
-                        form.element.show('slow');
-                    },
-
                     onError : function(form, jqXHR, textStatus, errorThrown){
-                        alert('ERROR');
+                        //alert('ERROR');
                     }
                 });
             });
