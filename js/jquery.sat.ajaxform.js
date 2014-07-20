@@ -36,8 +36,7 @@
         enableFileReader: false,
 
         fileReaderOptions : {
-            maxSize         : 2, // 4MB
-            uploadMultiple  : false // allows to upload multiple files
+            maxSize         : 2 // 4MB
         },
 
         enableMessage : true,
@@ -97,6 +96,8 @@
 
         formDataString : null,
 
+        uploadForm : false,
+
 
         init : function(){
             // is form valid for ajax submit
@@ -124,23 +125,73 @@
          */
         checkForm : function(){
             var
-                form    = this.element,
+                check       = false,
+                form        = this.element,
+
+                isUploadForm  = this.isUploadForm(),
+
                 // FileReader option
-                fro     = this.options.enableFileReader
+                fro         = this.options.enableFileReader
             ;
 
+
             // Check for multipart/form-data
-            if (!fro && typeof form.attr('enctype') !== 'undefined' && form.attr('enctype') === 'multipart/form-data') {
+            if(!fro && isUploadForm) {
                 this.options.errorMessage = '<strong>Ups!</strong><br />The form seems to be a file upload form.<br />The plugin doesn\'t support this type of form';
-                return false;
+                check = false;
             }
 
             // Check for file input type
-            if (!fro && form.find('input[type=file]').length) {
+            else if (!fro && isUploadForm) {
                 this.options.errorMessage = '<strong>Ups!</strong><br />Found one or more upload fields, the plugin doesn\'t support file upload.';
-                return false;
+                check = false;
             }
 
+            /**
+             * Is FileReader enabled and does the browser support it
+             */
+            else if(fro && isUploadForm && !this.supportsFileReader()){
+                check = false;
+            }
+
+            /**
+             * form seems to be ok
+             */
+            else{
+                check = true;
+            }
+
+
+
+            return check;
+        },
+
+        /**
+         * Checks the form for file upload fields
+         * @returns {Boolean}
+         */
+        isUploadForm : function(){
+            var form = this.element;
+
+            if( typeof form.attr('enctype') !== 'undefined' && form.attr('enctype') === 'multipart/form-data' ){
+                this.uploadForm = true;
+            }
+
+            else if ( form.find('input[type=file]').length>0 || form.find('button[type=file]').length>0 ) {
+                this.uploadForm = true;
+            }
+
+            return this.uploadForm;
+        },
+
+        /**
+         *
+         * @returns {Boolean}
+         */
+        supportsFileReader : function(){
+            if(typeof window.FileReader === "undefined"){
+              return false;
+            }
             return true;
         },
 
