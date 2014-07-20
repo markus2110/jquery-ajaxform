@@ -27,7 +27,7 @@
 (function($) {
 
     /**
-     *
+     * The defaults
      * @type Object
      */
     var defaults = {
@@ -58,6 +58,7 @@
 
         onError : function(form, jqXHR, textStatus, errorThrown){}
     };
+
     /**
      *
      * @param {opject} options
@@ -95,21 +96,59 @@
 
 
         init : function(){
-            this.extractProperties();
-            this.disableDefaultBehavior();
-            this.injectMessageBox();
+            // is form valid for ajax submit
+            if(this.checkForm()){
+                this.extractProperties();
+                this.disableDefaultBehavior();
+                this.injectMessageBox();
+            }
+
+            // not valid, show message
+            else{
+                var mBox = $(this.options.messageMarkup);
+                mBox.addClass('sat_ajaxform message_box');
+                mBox.addClass(this.options.errorClass);
+                mBox.html(this.options.errorMessage);
+                this.element.prepend(mBox);
+            }
         },
 
+        /**
+         * Checks the form, for file upload fields
+         * FileReader isn't yet implemented
+         *
+         * @returns {Boolean}
+         */
+        checkForm : function(){
+            // Check for multipart/form-data
+            if (typeof this.element.attr('enctype') !== 'undefined' && this.element.attr('enctype') === 'multipart/form-data') {
+                this.options.errorMessage = '<strong>Ups!</strong><br />The form seems to be a file upload form.<br />The plugin doesn\'t support this type of form';
+                return false;
+            }
+
+            // Check for file input type
+            if (this.element.find('input[type=file]').length) {
+                this.options.errorMessage = '<strong>Ups!</strong><br />Found one or more upload fields, the plugin doesn\'t support file upload.';
+                return false;
+            }
+
+            return true;
+        },
+
+        /**
+         *
+         * @returns {void}
+         */
         extractProperties : function(){
 
-            // set the submit url
+            // extract and set the submit url
             this.url    = this.element.attr('action');
 
-            // set the submit method
+            // extract and set the submit method
             this.method = this.element.attr('method');
 
+            // extract and set the ajax dataType
             this.dataType = this.element.attr('data-type');
-
         },
 
         /**
@@ -158,7 +197,7 @@
 
         /**
          *
-         * @param {type} event
+         * @param {object} event
          * @returns {Boolean} false to prevent default submit behavior
          */
         submit : function(event){
